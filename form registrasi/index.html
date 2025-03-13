@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Bukber Ramadhan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            cursor: pointer;
+        }
+        .add-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+        }
+        .add-btn:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            background: white;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .edit-btn {
+            background-color: #ffc107;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+        .paid-icon {
+            width: 18px;
+            height: 18px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        .location-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffcc00;
+            border-radius: 5px;
+        }
+        .location-box a {
+            font-weight: bold;
+            color: #333;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>List Buka Bersama Gibran</h2>
+        <form id="bukberForm">
+            <input type="text" id="nama" placeholder="Masukkan nama" required>
+            <select id="statusBayar">
+                <option value="Belum Bayar">Belum Bayar</option>
+                <option value="Sudah Bayar">Sudah Bayar</option>
+            </select>
+            <button type="submit" class="add-btn">Tambah</button>
+        </form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Status Bayar</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="list"></tbody>
+        </table>
+        <div class="location-box">
+            📍 Lokasi Bukber:  
+            <a href="https://maps.app.goo.gl/8uPY9RcFZR2sYq1j9" target="_blank">Klik untuk melihat di Google Maps</a><br>
+            <br>
+
+            <h4>Hiburan Ibu Iis Dahlia</h4>
+            <audio controls autoplay>
+              <source src="./videoplayback (1).m4a" type="audio/ogg">
+              Hiburan Iis Dahlia
+            </audio>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", loadList);
+
+        document.getElementById("bukberForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let nama = document.getElementById("nama").value;
+            let status = document.getElementById("statusBayar").value;
+            let list = JSON.parse(localStorage.getItem("bukberList")) || [];
+            list.push({ nama, status });
+            localStorage.setItem("bukberList", JSON.stringify(list));
+            document.getElementById("nama").value = "";
+            loadList();
+        });
+
+        function loadList() {
+            let list = JSON.parse(localStorage.getItem("bukberList")) || [];
+            let tbody = document.getElementById("list");
+            tbody.innerHTML = "";
+            list.forEach((item, index) => {
+                let statusIcon = item.status === "Sudah Bayar" 
+                    ? '<img src="https://cdn-icons-png.flaticon.com/512/845/845646.png" alt="Paid" class="paid-icon">' 
+                    : '<img src="https://cdn-icons-png.flaticon.com/512/1828/1828843.png" alt="Not Paid" class="paid-icon">';
+                let row = `<tr>
+                    <td>${item.nama} ${statusIcon}</td>
+                    <td>${item.status}</td>
+                    <td>
+                        <button class="edit-btn" onclick="edit(${index})">Edit</button>
+                        <button class="delete-btn" onclick="hapus(${index})">Hapus</button>
+                    </td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function hapus(index) {
+            let list = JSON.parse(localStorage.getItem("bukberList"));
+            list.splice(index, 1);
+            localStorage.setItem("bukberList", JSON.stringify(list));
+            loadList();
+        }
+
+        function edit(index) {
+            let list = JSON.parse(localStorage.getItem("bukberList"));
+            let namaBaru = list[index].nama;
+            
+            // Tampilkan pilihan untuk mengubah status
+            let statusBaru = list[index].status === "Sudah Bayar" ? "Belum Bayar" : "Sudah Bayar";
+            
+            let konfirmasi = confirm(`Apakah ingin mengubah status ${namaBaru} menjadi "${statusBaru}"?`);
+            if (konfirmasi) {
+                list[index].status = statusBaru;
+                localStorage.setItem("bukberList", JSON.stringify(list));
+                loadList();
+            }
+        }
+    </script>
+</body>
+</html>
